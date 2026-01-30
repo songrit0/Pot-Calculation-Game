@@ -1,27 +1,23 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
-import { 
-  Plus, Minus, Equal, RotateCcw, User, Coins, 
-  X as CloseIcon, Wifi, Link as LinkIcon, 
+import {
+  Plus, Minus, Equal, RotateCcw, User, Coins,
+  X as CloseIcon, Wifi, Link as LinkIcon,
   ArrowUpRight, CheckCircle2, AlertCircle, Smartphone, Database, Server
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set, onValue, push, onChildAdded, remove, serverTimestamp } from 'firebase/database';
 
-/**
- * FIREBASE CONFIGURATION
- * นำข้อมูลจาก Firebase Console ของคุณมาวางที่นี่
- */
 const firebaseConfig = {
-  apiKey: "AIzaSyB2P-RM-a46n1m_E4SDvqRqhl89pR-w5rw",
-  authDomain: "pot-calculation-game.firebaseapp.com",
-  databaseURL: "https://pot-calculation-game-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "pot-calculation-game",
-  storageBucket: "pot-calculation-game.firebasestorage.app",
-  messagingSenderId: "368857035644",
-  appId: "1:368857035644:web:b9a4952cfee1a9dac92af9",
-  measurementId: "G-PXSR67LL99"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
@@ -48,7 +44,7 @@ class SoundEngine {
         gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
         osc.start(now); osc.stop(now + 0.1); break;
       case 'confirm':
-        osc.type = 'triangle'; [523.25, 659.25, 783.99].forEach((f, i) => osc.frequency.setValueAtTime(f, now + i * 0.1));
+        osc.type = 'triangle';[523.25, 659.25, 783.99].forEach((f, i) => osc.frequency.setValueAtTime(f, now + i * 0.1));
         gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
         osc.start(now); osc.stop(now + 0.3); break;
       case 'win':
@@ -72,7 +68,7 @@ const sounds = new SoundEngine();
 const NumberDisplay = ({ value, label, color = "text-white", size = "text-4xl" }: any) => (
   <div className="flex flex-col items-center">
     <span className="text-slate-400 text-[10px] font-semibold mb-1 uppercase tracking-widest">{label}</span>
-    <motion.div 
+    <motion.div
       key={value} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
       className={`mono-font ${size} ${color} font-bold led-glow`}
     >
@@ -83,7 +79,7 @@ const NumberDisplay = ({ value, label, color = "text-white", size = "text-4xl" }
 
 const App = () => {
   const INITIAL_BALANCE = 10000;
-  
+
   // Game State
   const [p1Balance, setP1Balance] = useState(INITIAL_BALANCE);
   const [p2Balance, setP2Balance] = useState(INITIAL_BALANCE);
@@ -154,7 +150,7 @@ const App = () => {
   }, []);
 
   // --- Firebase Sync Logic ---
-  
+
   // 1. Host sends commands or states
   const sendCommand = (action: string) => {
     if (!roomId) return;
@@ -220,7 +216,7 @@ const App = () => {
     setIsConnected(true);
     setShowSyncModal(false);
     sounds.play('confirm');
-    
+
     if (asHost) {
       // Clear old data if hosting new session
       remove(ref(db, `rooms/${cleanedId}`));
@@ -261,7 +257,7 @@ const App = () => {
           <AnimatePresence>
             {winner && (
               <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 1.5, opacity: 0 }} className="absolute inset-0 flex items-center justify-center z-10 bg-slate-950/60 backdrop-blur-md">
-                <div className="rainbow-text text-4xl md:text-6xl text-center leading-tight">PLAYER {winner}<br/>WIN!</div>
+                <div className="rainbow-text text-4xl md:text-6xl text-center leading-tight">PLAYER {winner}<br />WIN!</div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -278,7 +274,7 @@ const App = () => {
           <div className="grid grid-cols-3 gap-3">
             <ControlButton onClick={handleAddPending} icon={<Plus />} label="+1,000" color="bg-blue-600 hover:bg-blue-500" />
             <ControlButton onClick={handleSubPending} icon={<Minus />} label="-1,000" color="bg-slate-700 hover:bg-slate-600" />
-            <ControlButton onClick={handleCommit} icon={<Equal className="w-8 h-8"/>} label="COMMIT" color="bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20 shadow-lg" highlight />
+            <ControlButton onClick={handleCommit} icon={<Equal className="w-8 h-8" />} label="COMMIT" color="bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20 shadow-lg" highlight />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <ControlButton onClick={() => handleWin(1)} icon={<ArrowUpRight />} label="P1 WIN" color="bg-blue-900/30 border-blue-500/30 text-blue-400" />
@@ -310,7 +306,7 @@ const App = () => {
                   <button onClick={() => handleStartSession(false)} className="py-5 rounded-2xl bg-slate-800 text-slate-300 font-bold border border-slate-700">JOIN</button>
                 </div>
                 <p className="text-center text-[10px] text-slate-500 leading-relaxed font-medium">
-                  * ใช้ Firebase Realtime Database ในการรับส่งข้อมูล<br/>
+                  * ใช้ Firebase Realtime Database ในการรับส่งข้อมูล<br />
                   * Host คือเครื่องหลักที่ใช้แสดงผล / Join คือเครื่องรีโมท
                 </p>
               </div>
