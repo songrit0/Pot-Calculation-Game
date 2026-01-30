@@ -42,5 +42,7 @@ jobs:
 
       - name: Output Deployment URL
         run: |
-          echo "🚀 Deployed to: ${{ steps.deploy.outputs.details_url }}"
-          echo "🌐 Hosting URL: ${{ steps.deploy.outputs.hosting_url }}"
+          echo "🚀 Details: ${{ steps.deploy.outputs.details_url }}"
+          echo "🌐 Live URL: ${{ steps.deploy.outputs.url }}"
+          echo "### 🚀 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "**Live URL:** ${{ steps.deploy.outputs.url }}" >> $GITHUB_STEP_SUMMARY
